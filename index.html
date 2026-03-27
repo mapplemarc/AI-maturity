@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Transformation Maturity Assessment | MJA Consulting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #ffffff;
+      --off-white: #f9f9f9;
+      --surface: #f4f4f4;
+      --border: #e4e4e4;
+      --border-strong: #c8c8c8;
+      --text-primary: #111111;
+      --text-secondary: #555555;
+      --text-muted: #999999;
+      --accent: #1a1a1a;
+      --blue: #00A8CC;
+      --blue-light: #e0f9fd;
+      --blue-mid: #9beaf7;
+      --teal-dark: #0A3948;
+      --teal-mid: #105368;
+      --teal-bright: #1E7A94;
+      --teal-gradient: radial-gradient(ellipse at 65% 105%, #1E7A94 0%, #105368 45%, #0A3948 100%);
+      --green: #059669;
+      --green-light: #ecfdf5;
+      --amber: #d97706;
+      --amber-light: #fffbeb;
+      --red: #dc2626;
+      --red-light: #fef2f2;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.1);
+      --transition: 180ms ease;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--white);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ─── GLOBAL HEADER ──────────────────────────────────── */
+    .site-header {
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .site-header .brand { font-size: 14px; font-weight: 700; letter-spacing: 0px; color: var(--text-primary); }
+    .site-header .brand span { font-weight: inherit; color: inherit; }
+    .header-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ─── BUTTONS ─────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition);
+      border: 1.5px solid transparent;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: #2d2d2d; border-color: #2d2d2d; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn-secondary {
+      background: var(--white);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+    .btn-secondary:hover { background: var(--surface); border-color: var(--text-muted); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border-color: transparent;
+      padding-left: 0;
+    }
+    .btn-ghost:hover { color: var(--text-primary); }
+    .btn-lg { padding: 16px 32px; font-size: 15px; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+    /* ─── WELCOME SCREEN ─────────────────────────────────── */
+    #screen-welcome {
+      background: var(--teal-gradient);
+    }
+    #screen-welcome .site-header {
+      background: transparent;
+      border-bottom-color: rgba(255,255,255,0.12);
+    }
+    #screen-welcome .site-header .brand { color: rgba(255,255,255,0.95); }
+    #screen-welcome .header-badge { color: rgba(255,255,255,0.45); }
+    #screen-welcome .hero {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 40px;
+    }
+    .hero-inner {
+      max-width: 640px;
+      width: 100%;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 5px 12px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .hero-title {
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      margin-bottom: 20px;
+    }
+    .hero-title em { font-style: normal; color: #00E5FF; }
+    .hero-subtitle {
+      font-size: 17px;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.65;
+      margin-bottom: 40px;
+      max-width: 520px;
+    }
+    .hero-meta {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .hero-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      font-weight: 500;
+    }
+    .hero-meta-item .dot {
+      width: 6px;
+      height: 6px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 50%;
+    }
+    #screen-welcome .btn-primary {
+      background: #00E5FF;
+      color: var(--teal-dark);
+      border-color: transparent;
+    }
+    #screen-welcome .btn-primary:hover {
+      background: #33EAFF;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(0, 229, 255, 0.35);
+    }
+    .hero-divider {
+      width: 48px;
+      height: 2px;
+      background: rgba(255,255,255,0.2);
+      margin: 40px 0;
+    }
+    .hero-footer-note {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 16px;
+    }
+
+    /* ─── SETUP SCREEN ───────────────────────────────────── */
+    #screen-setup {
+      background: var(--teal-gradient);
+    }
+    #screen-setup .site-header {
+      background: transparent;
+      border-bottom-color: rgba(255,255,255,0.12);
+    }
+    #screen-setup .site-header .brand { color: rgba(255,255,255,0.95); }
+    #screen-setup .btn-ghost { color: rgba(255,255,255,0.7); }
+    #screen-setup .btn-ghost:hover { color: rgba(255,255,255,1); }
+    #screen-setup .setup-body {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 40px 60px;
+    }
+    .setup-inner {
+      max-width: 560px;
+      width: 100%;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 40px 44px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.22);
+    }
+    .setup-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0px;
+      margin-bottom: 8px;
+    }
+    .setup-subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+    }
+    .form-group {
+      margin-bottom: 24px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      letter-spacing: 0.1px;
+    }
+    .form-label .required { color: var(--blue); margin-left: 2px; }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 11px 14px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text-primary);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+      appearance: none;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0, 168, 204, 0.2);
+    }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-error { font-size: 12px; color: var(--red); margin-top: 5px; display: none; }
+    .form-error.visible { display: block; }
+
+    /* ─── ASSESSMENT SCREEN ──────────────────────────────── */
+    #screen-assessment { flex-direction: row; }
+    .assessment-sidebar {
+      width: 240px;
+      min-width: 240px;
+      border-right: none;
+      padding: 32px 24px;
+      background: var(--teal-gradient);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar-brand {
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.95);
+      letter-spacing: 0px;
+      margin-bottom: 0;
+    }
+    .sidebar-brand span { font-weight: inherit; color: inherit; }
+    .sidebar-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+      margin: 24px 0;
+    }
+    .sidebar-progress-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 16px;
+    }
+    .sidebar-progress-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .sidebar-progress-fill {
+      height: 100%;
+      background: #00E5FF;
+      border-radius: 100px;
+      transition: width 400ms ease;
+    }
+    .sidebar-nav-list { list-style: none; }
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: default;
+      margin-bottom: 2px;
+      transition: background var(--transition);
+    }
+    .sidebar-nav-item.current {
+      background: rgba(255,255,255,0.12);
+    }
+    .sidebar-nav-item.completed { cursor: pointer; }
+    .sidebar-nav-item.completed:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-nav-indicator {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      transition: all var(--transition);
+      background: transparent;
+    }
+    .sidebar-nav-item.current .sidebar-nav-indicator {
+      border-color: #00E5FF;
+      background: #00E5FF;
+      color: var(--teal-dark);
+    }
+    .sidebar-nav-item.completed .sidebar-nav-indicator {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--white);
+    }
+    .sidebar-nav-indicator .check { font-size: 10px; }
+    .sidebar-nav-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.3;
+    }
+    .sidebar-nav-item.current .sidebar-nav-text { color: #ffffff; font-weight: 600; }
+    .sidebar-nav-item.completed .sidebar-nav-text { color: rgba(255,255,255,0.8); }
+
+    .assessment-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .assessment-content {
+      flex: 1;
+      padding: 48px 56px;
+      max-width: 760px;
+    }
+    .category-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .category-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .category-name-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--blue);
+    }
+    .category-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0px;
+      margin-bottom: 8px;
+    }
+    .category-description {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    .question-block {
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .question-block:last-child { border-bottom: none; }
+    .question-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .question-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 18px;
+      line-height: 1.4;
+    }
+    .answer-list { display: flex; flex-direction: column; gap: 8px; }
+    .answer-card {
+      padding: 14px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--white);
+    }
+    .answer-card:hover {
+      border-color: var(--blue);
+      background: var(--blue-light);
+    }
+    .answer-card.selected {
+      border-color: var(--blue);
+      background: var(--blue-light);
+    }
+    .answer-radio {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+      transition: all var(--transition);
+      background: var(--white);
+    }
+    .answer-card.selected .answer-radio {
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+    .answer-radio-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--white);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .answer-card.selected .answer-radio-dot { opacity: 1; }
+    .answer-text {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.45;
+    }
+    .answer-card.selected .answer-text { color: var(--blue); font-weight: 500; }
+    .answer-level {
+      margin-left: auto;
+      min-width: 60px;
+      text-align: right;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding-top: 2px;
+    }
+    .answer-card.selected .answer-level { color: var(--blue); }
+
+    .assessment-footer {
+      padding: 24px 56px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      position: sticky;
+      bottom: 0;
+    }
+    .footer-progress-text { font-size: 13px; color: var(--text-muted); }
+    .footer-progress-text strong { color: var(--text-primary); font-weight: 600; }
+    .footer-actions { display: flex; gap: 12px; align-items: center; }
+    .unanswered-warning {
+      font-size: 12px;
+      color: var(--amber);
+      font-weight: 500;
+      display: none;
+    }
+    .unanswered-warning.visible { display: block; }
+
+    /* ─── RESULTS SCREEN ─────────────────────────────────── */
+    #screen-results .results-body {
+      flex: 1;
+      background: var(--off-white);
+    }
+    .results-hero {
+      background: var(--teal-gradient);
+      color: var(--white);
+      padding: 60px 60px 80px;
+    }
+    .results-hero-inner { max-width: 900px; }
+    .results-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 8px;
+    }
+    .results-hero-name {
+      font-size: 22px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 32px;
+    }
+    .results-score-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .results-score-big {
+      font-size: 88px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .results-score-label {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+    .results-tier-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin-bottom: 12px;
+    }
+    .results-tier-text {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .results-tier-sub { font-size: 14px; color: rgba(255,255,255,0.6); }
+
+    .results-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 60px;
+    }
+    .results-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .results-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px 32px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .exec-summary-text {
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--text-secondary);
+    }
+    .exec-summary-text strong { color: var(--text-primary); font-weight: 600; }
+
+    /* Recommendations */
+    .reco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .reco-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .reco-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .reco-timeframe-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .reco-timeframe { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); }
+    .reco-card-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+    .reco-list { list-style: none; }
+    .reco-list li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.45;
+    }
+    .reco-list li:last-child { border-bottom: none; }
+    .reco-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    /* Category scores */
+    .category-score-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    .category-score-header {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .category-score-header:hover { background: var(--off-white); }
+    .cat-score-number {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0px;
+      min-width: 60px;
+    }
+    .cat-score-bar-container { flex: 1; }
+    .cat-score-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .cat-score-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .cat-score-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 800ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cat-score-tier {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+      min-width: 90px;
+      text-align: center;
+    }
+    .cat-expand-icon { font-size: 14px; color: var(--text-muted); transition: transform var(--transition); }
+    .category-score-card.expanded .cat-expand-icon { transform: rotate(180deg); }
+    .category-score-body {
+      padding: 0 24px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 400ms ease, padding 300ms ease;
+    }
+    .category-score-card.expanded .category-score-body {
+      max-height: 600px;
+      padding: 0 24px 24px;
+    }
+    .category-commentary {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .category-question-scores { margin-top: 16px; }
+    .q-score-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .q-score-row:last-child { border-bottom: none; }
+    .q-score-text { font-size: 12px; color: var(--text-secondary); flex: 1; }
+    .q-score-dots { display: flex; gap: 4px; }
+    .q-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    .q-dot.filled { background: var(--blue); }
+
+    /* Team comparison */
+    .comparison-container {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+    }
+    .comparison-chart-wrap {
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+    }
+    .comparison-chart { flex: 1; max-width: 400px; }
+    .comparison-table { flex: 1; }
+    .comparison-table-header {
+      display: grid;
+      grid-template-columns: 1fr 52px 64px 48px;
+      gap: 4px;
+      padding: 8px 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .comparison-col-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); text-align: right; }
+    .comparison-col-header:first-child { text-align: left; }
+    .comparison-table-row {
+      display: grid;
+      grid-template-columns: 1fr 52px 64px 48px;
+      gap: 4px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+    .comparison-table-row:last-child { border-bottom: none; }
+    .comparison-cat-name { font-size: 13px; font-weight: 500; }
+    .comparison-score {
+      font-size: 14px;
+      font-weight: 700;
+      text-align: right;
+    }
+    .comparison-diff {
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
+    }
+    .diff-pos { color: var(--green); }
+    .diff-neg { color: var(--red); }
+    .diff-neutral { color: var(--text-muted); }
+    .comparison-no-data {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .comparison-no-data strong { display: block; font-size: 16px; color: var(--text-secondary); margin-bottom: 8px; }
+
+    /* Score color utils */
+    .score-leading { color: #059669; }
+    .score-advanced { color: #00A8CC; }
+    .score-progressing { color: #7c3aed; }
+    .score-developing { color: #d97706; }
+    .score-beginning { color: #dc2626; }
+
+    .bg-leading { background: #ecfdf5; color: #059669; }
+    .bg-advanced { background: #e0f9fd; color: #00A8CC; }
+    .bg-progressing { background: #f5f3ff; color: #7c3aed; }
+    .bg-developing { background: #fffbeb; color: #d97706; }
+    .bg-beginning { background: #fef2f2; color: #dc2626; }
+
+    .bar-leading { background: #059669; }
+    .bar-advanced { background: #00A8CC; }
+    .bar-progressing { background: #7c3aed; }
+    .bar-developing { background: #d97706; }
+    .bar-beginning { background: #dc2626; }
+
+    .tier-hero-leading { background: rgba(5, 150, 105, 0.2); color: #6ee7b7; }
+    .tier-hero-advanced { background: rgba(0, 168, 204, 0.22); color: #00E5FF; }
+    .tier-hero-progressing { background: rgba(124, 58, 237, 0.2); color: #c4b5fd; }
+    .tier-hero-developing { background: rgba(217, 119, 6, 0.2); color: #fcd34d; }
+    .tier-hero-beginning { background: rgba(220, 38, 38, 0.2); color: #fca5a5; }
+
+    .sidebar-company-name {
+      margin-top: auto;
+      padding: 20px 20px 24px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      word-break: break-word;
+    }
+    .results-header-company {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding-right: 4px;
+    }
+    .report-actions-row {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding: 0 40px 40px;
+    }
+    .results-footer {
+      background: var(--teal-dark);
+      color: var(--white);
+      padding: 32px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .results-footer-brand { font-size: 14px; font-weight: 700; }
+    .results-footer-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .results-footer-actions { display: flex; gap: 12px; }
+    .btn-white {
+      background: var(--white);
+      color: var(--accent);
+      border-color: var(--white);
+    }
+    .btn-white:hover { background: #f0f0f0; }
+    .btn-outline-white {
+      background: transparent;
+      color: var(--white);
+      border-color: rgba(255,255,255,0.4);
+    }
+    .btn-outline-white:hover { border-color: var(--white); background: rgba(255,255,255,0.08); }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .assessment-sidebar { display: none; }
+      .assessment-content { padding: 32px 24px; }
+      .assessment-footer { padding: 20px 24px; }
+      .results-hero { padding: 40px 24px 60px; }
+      .results-section { padding: 32px 24px; }
+      .reco-grid { grid-template-columns: 1fr; }
+      .comparison-chart-wrap { flex-direction: column; }
+      .comparison-chart { max-width: 100%; }
+      .results-footer { flex-direction: column; gap: 16px; padding: 24px; }
+    }
+    @media (max-width: 600px) {
+      .site-header { padding: 16px 20px; }
+      .hero { padding: 48px 24px !important; }
+      .setup-body { padding: 32px 24px !important; }
+      .form-row { grid-template-columns: 1fr; }
+      .results-score-row { gap: 24px; }
+      .results-score-big { font-size: 64px; }
+    }
+
+    @media print {
+      .site-header, .assessment-sidebar, .assessment-footer, .results-footer, .no-print { display: none !important; }
+      #screen-results { display: block !important; }
+      .category-score-body {
+        max-height: none !important;
+        padding: 0 24px 24px !important;
+        overflow: visible !important;
+      }
+      .cat-expand-icon { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     WELCOME SCREEN
+════════════════════════════════════════════════════════ -->
+<div id="screen-welcome" class="screen active">
+  <header class="site-header">
+    <div class="brand">MJA <span>Consulting</span></div>
+  </header>
+  <div class="hero">
+    <div class="hero-inner">
+      <h1 class="hero-title">AI Transformation<br><em>Maturity Assessment</em></h1>
+      <p class="hero-subtitle">
+        Understand where your marketing organization truly stands on the path to AI transformation—and get a personalized, actionable report to inform your strategy.
+      </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item"><span class="dot"></span>7 capability dimensions</div>
+        <div class="hero-meta-item"><span class="dot"></span>24 targeted questions</div>
+        <div class="hero-meta-item"><span class="dot"></span>~10 minutes to complete</div>
+        <div class="hero-meta-item"><span class="dot"></span>Personalized action report</div>
+      </div>
+      <button class="btn btn-primary btn-lg" onclick="showScreen('setup')">Begin Assessment →</button>
+      <p class="hero-footer-note">Your responses are stored locally and used only to generate your report and team aggregate comparison.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SETUP SCREEN
+════════════════════════════════════════════════════════ -->
+<div id="screen-setup" class="screen">
+  <header class="site-header">
+    <div class="brand">MJA <span>Consulting</span></div>
+    <button class="btn btn-ghost" onclick="showScreen('welcome')">← Back</button>
+  </header>
+  <div class="setup-body">
+    <div class="setup-inner">
+      <h2 class="setup-title">Before we begin</h2>
+      <p class="setup-subtitle">Tell us a bit about you and your organization so we can tailor your results.</p>
+      <form id="setup-form" onsubmit="handleSetupSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="f-company">Company Name <span class="required">*</span></label>
+          <input id="f-company" class="form-input" type="text" placeholder="e.g. Acme Corp" autocomplete="organization" />
+          <div id="e-company" class="form-error">Please enter your company name.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-role">Role in Marketing &amp; Communications <span class="required">*</span></label>
+          <select id="f-role" class="form-select">
+            <option value="">Select your function...</option>
+            <option>CMO or CMCO</option>
+            <option>Brand &amp; Creative</option>
+            <option>Digital &amp; Performance Marketing</option>
+            <option>Content</option>
+            <option>Communications &amp; PR</option>
+            <option>Media &amp; Advertising</option>
+            <option>Marketing Operations &amp; Technology</option>
+            <option>Data &amp; Analytics</option>
+            <option>Strategy &amp; Insights</option>
+            <option>Other</option>
+          </select>
+          <div id="e-role" class="form-error">Please select your role.</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-title">Title / Level <span class="required">*</span></label>
+            <select id="f-title" class="form-select">
+              <option value="">Select level...</option>
+              <option>Marketing Leadership Team</option>
+              <option>Seasoned Leader</option>
+              <option>Mid-Career</option>
+              <option>Early Career</option>
+            </select>
+            <div id="e-title" class="form-error">Please select your title level.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-location">Country <span class="required">*</span></label>
+            <select id="f-location" class="form-select">
+              <option value="">Select country...</option>
+              <option>United States</option>
+              <option>United Kingdom</option>
+              <option>Canada</option>
+              <option>Australia</option>
+              <option>Germany</option>
+              <option>France</option>
+              <option>Netherlands</option>
+              <option>Spain</option>
+              <option>Italy</option>
+              <option>Sweden</option>
+              <option>Denmark</option>
+              <option>Norway</option>
+              <option>Switzerland</option>
+              <option>Belgium</option>
+              <option>Ireland</option>
+              <option>Singapore</option>
+              <option>Japan</option>
+              <option>India</option>
+              <option>China</option>
+              <option>Brazil</option>
+              <option>Mexico</option>
+              <option>UAE</option>
+              <option>South Africa</option>
+              <option>New Zealand</option>
+              <option>Other</option>
+            </select>
+            <div id="e-location" class="form-error">Please select your country.</div>
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <button type="submit" class="btn btn-primary btn-lg">Start Assessment →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     ASSESSMENT SCREEN
+════════════════════════════════════════════════════════ -->
+<div id="screen-assessment" class="screen">
+  <div class="assessment-sidebar" id="assessment-sidebar">
+    <div class="sidebar-brand">MJA <span>Consulting</span></div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-progress-label">Your Progress</div>
+    <ul class="sidebar-nav-list" id="sidebar-nav-list"></ul>
+    <div class="sidebar-company-name" id="sidebar-company-name"></div>
+  </div>
+  <div class="assessment-main">
+    <div class="assessment-content" id="assessment-content">
+      <!-- Rendered dynamically -->
+    </div>
+    <div class="assessment-footer">
+      <div class="footer-progress-text" id="footer-progress-text"></div>
+      <div class="footer-actions">
+        <span class="unanswered-warning" id="unanswered-warning">Please answer all questions to continue.</span>
+        <button class="btn btn-secondary" id="btn-prev" onclick="prevCategory()">← Back</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextCategory()">Continue →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     RESULTS SCREEN
+════════════════════════════════════════════════════════ -->
+<div id="screen-results" class="screen">
+  <header class="site-header">
+    <div class="brand">MJA <span>Consulting</span></div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div class="results-header-company" id="results-header-company"></div>
+      <button class="btn btn-secondary" onclick="saveReport()">Save Report</button>
+      <button class="btn btn-secondary" onclick="window.print()">Print Report</button>
+    </div>
+  </header>
+  <div class="results-body" id="results-body">
+    <!-- Rendered dynamically -->
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════ -->
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────
+const CATEGORIES = [
+  {
+    id: 'leadership',
+    name: 'Leadership',
+    description: 'Executive sponsorship, strategic alignment, committed investment, incentives, and program operations',
+    questions: [
+      {
+        text: 'What level of executive sponsorship exists?',
+        answers: [
+          'No sponsorship exists — AI is not on leadership\'s agenda',
+          'Sponsorship exists but below the CMO — mid-level champions only',
+          'CMO is aware and supportive but is not a formal sponsor and a mandate doesn\'t exist',
+          'CMO sponsorship with a formal change mandate exists',
+          'The CEO is directly sponsoring the AI program, working with the CMO on driving the mandate across the enterprise'
+        ]
+      },
+      {
+        text: 'What level of budget investment exists?',
+        answers: [
+          'No dedicated budget — any spending requires ad hoc reallocation',
+          'Minimal, one-time exploratory budget has been approved',
+          'An annual budget exists but is not protected',
+          'A dedicated, multi-year AI budget is secured',
+          'A dedicated, multi-year AI budget is secured with a mechanism to scale tied to ROI metrics'
+        ]
+      },
+      {
+        text: 'Do you have an aligned AI strategy across the function?',
+        answers: [
+          'No strategy exists — individual teams are experimenting in silos',
+          'Individual team strategies exist but there\'s no organizational coherence',
+          'A unified strategy exists but is not well known or actively prioritized',
+          'A unified strategy has been communicated and informs roadmap prioritization, but it\'s not specific to business outcomes',
+          'A unified strategy is well communicated, tied to business outcomes, and actively informs roadmap prioritization'
+        ]
+      },
+      {
+        text: 'How are you operationalizing your AI program in the marketing function?',
+        answers: [
+          'It\'s not a formal program yet — mostly bottoms-up experimentation',
+          'It\'s a formal program, but it\'s run as a "+1 job" without dedicated people',
+          'We have a formal program with a dedicated leader',
+          'We have a formal program, a dedicated leader, and a core dedicated cross-functional team driving implementation',
+          'We have a formal program, a dedicated leader, a core cross-functional support team, and an active champion group'
+        ]
+      },
+      {
+        text: 'Do incentives exist related to gen AI training, adoption, or proficiency?',
+        answers: [
+          'Nothing formal exists — the only incentive is discussing how important learning is to employee careers',
+          'Discussions have started about creating formal incentives',
+          'Some formal incentives are aligned but have not been implemented',
+          'Broad incentives have been implemented across the function',
+          'Role-based incentives have been implemented across the function'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'adoption',
+    name: 'Adoption & Proficiency',
+    description: 'Frequency of use, employee proficiency, and leadership AI fluency',
+    questions: [
+      {
+        text: 'How often are people using gen AI tools today?',
+        answers: [
+          'Rarely or never — they\'ve tried and stopped or are actively against using it',
+          'A few times per month — occasional use but not a regular habit',
+          '1–2 times per week for some repeatable, familiar tasks',
+          'Several times per week — regular AI use is becoming the norm for most',
+          'Daily — AI tools are a standard part of most team members\' workflows and new work planning starts with AI as a core input'
+        ]
+      },
+      {
+        text: 'What does the average employee use gen AI for?',
+        answers: [
+          'They are not really using it',
+          'Basic individual use — summarizing documents, rewriting emails, knowledge search',
+          'Intermediate individual use — brainstorming partner, strategic analysis, digital co-worker to drive individual productivity',
+          'Advanced individual use — building agents to codify and rapidly scale their individual productivity and impact',
+          'Expert proficiency — builds agents and orchestrates shared workflows that deliver shared productivity and impact gains for the entire function'
+        ]
+      },
+      {
+        text: 'How are the leadership team members using generative AI?',
+        answers: [
+          'They are not really using it',
+          'Basic individual use — summarizing documents, rewriting emails, knowledge search',
+          'Intermediate individual use — brainstorming partner, strategic analysis, digital co-worker to drive individual productivity',
+          'Advanced individual use — building agents to codify and rapidly scale their individual productivity and impact',
+          'Expert proficiency — builds agents and orchestrates shared workflows that deliver shared productivity and impact gains for the entire function'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'change',
+    name: 'Change Capability & Culture',
+    description: 'Change management maturity, feedback mechanisms, and organizational culture',
+    questions: [
+      {
+        text: 'Does dedicated change management exist for the AI program?',
+        answers: [
+          'There is no formal change program or change management lead',
+          'There is an informal program being run by individual teams',
+          'There is a formal program but it is not run centrally — it\'s a +1 job for everyone',
+          'There is a formal, centralized program with a dedicated lead driving it',
+          'There is a formal, centralized program with a dedicated lead and formal champion roles in each function'
+        ]
+      },
+      {
+        text: 'Are there mechanisms or community forums to get feedback or help using gen AI?',
+        answers: [
+          'No, there is nothing organized — it\'s primarily: find someone you know who is good and ask them for help',
+          'Nothing formal, but some employees have taken it upon themselves to start an office hours that people are starting to hear about',
+          'An official internal forum and regular office hours exist, but primary feedback comes from tool usage data',
+          'Both tool usage data and change program insights inform the program — an official internal forum with a robust shared knowledge base and regular office hours are being actively managed',
+          'A robust feedback mechanism exists for both change and product teams, including tool telemetrics, change program engagement, and qualitative surveys — with expansive programming across comms, content, and events'
+        ]
+      },
+      {
+        text: 'Does the organization have an embedded culture and appetite for change?',
+        answers: [
+          'No — it\'s a very risk-averse culture where the mentality is: if it\'s not broken, don\'t fix it',
+          'Not really — when people say change, they mean incremental, not transformational',
+          'Somewhat — there are people who want to do things differently, but after some failed transformation initiatives, there is still hesitancy',
+          'Yes — the majority of people here are hungry for a different way to work and we have seen successes in some transformation programs we\'ve tried',
+          'Absolutely — this is a culture built on innovation with a history of transformation success; people welcome change'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'process',
+    name: 'Process Maturity',
+    description: 'Documentation depth, governance, and change management of marketing work processes',
+    questions: [
+      {
+        text: 'What % of work processes are documented?',
+        answers: [
+          'Less than 25% — most processes live in people\'s heads or tribal knowledge',
+          '25–50% — key processes have some documentation, but gaps are significant',
+          '51–75% — most processes are documented, though not always current',
+          '76–90% — the vast majority of processes are documented',
+          'More than 90% — nearly all processes are documented'
+        ]
+      },
+      {
+        text: 'Of the documented processes, how detailed are they on average?',
+        answers: [
+          'General work phases, principles of work, and key human steps are included',
+          'All work phases with a more robust set of human steps are detailed',
+          'All human steps with key dependencies across all phases of the workflow are documented',
+          'All steps in the workflow with key dependencies and risks are documented – including human steps, the data sources/flows and tech platforms used',
+          'Same as above, with agent tasks, roles, steps, agentic guardrails, and human judgement escalation points documented'
+        ]
+      },
+      {
+        text: 'How are processes governed and optimized today?',
+        answers: [
+          'There is little to no process governance — when individuals hit a snag, they create workarounds to optimize their own process',
+          'Teams evaluate their own processes at the end of major projects to identify pain points and optimize them',
+          'Teams have their own ops lead who evaluates processes across their area and creates templated solutions for their group',
+          'A central operations group tracks operational KPIs across the function and works with designated team ops leads to optimize at a cadence',
+          'Industrialized governance exists with formalized KPIs, regular ops reporting, and a central team working with an established ops lead in each subfunction'
+        ]
+      },
+      {
+        text: 'How do changes in process get communicated and enforced?',
+        answers: [
+          'Process changes happen informally and/or are not consistently communicated',
+          'Changes are communicated with no confirmation of understanding',
+          'Changes are communicated consistently with some acknowledgement tracked, and team workflow platforms are updated to help enforce',
+          'A structured change management and training approach exists with tracked awareness, and centralized workflow platforms enforce automatically',
+          'A structured change management and training approach exists with tracked awareness, and centralized workflow platforms enforce both human and agent workflows'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'data',
+    name: 'Data Readiness',
+    description: 'Integration, taxonomy, governance, and quality of marketing data',
+    questions: [
+      {
+        text: 'Are your marketing data sources connected and interoperable?',
+        answers: [
+          'Most data is siloed — no meaningful integration exists across systems',
+          'Some point-to-point integrations exist but it\'s not reliable',
+          'Several key data sources are integrated but reliability is inconsistent',
+          'Most marketing data sources connect reliably via a central data layer or CDP',
+          'All marketing function data sources are fully integrated, interoperable, and accessible in real time'
+        ]
+      },
+      {
+        text: 'Does structured data across your systems follow a unified taxonomy?',
+        answers: [
+          'No unified taxonomy exists — each system uses its own definitions and naming conventions',
+          'Some shared terminology exists but is inconsistently applied',
+          'A shared taxonomy exists for core entities but is not universally enforced',
+          'A unified taxonomy is in place and widely adopted across major systems in marketing',
+          'An enterprise-wide taxonomy informs a unified marketing taxonomy widely adopted across all systems'
+        ]
+      },
+      {
+        text: 'Is data regularly and/or automatically cleaned and governed?',
+        answers: [
+          'No data governance or cleaning processes exist',
+          'Data is cleaned reactively only when problems arise',
+          'Periodic manual data cleaning occurs on a scheduled basis, with some sources having an identified owner',
+          'Automated data quality checks exist with regular governance reviews and most sources having dedicated owners accountable for quality',
+          'A mature data governance framework exists with automated cleaning, monitoring, escalation, and all sources with dedicated owners accountable for quality'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'martech',
+    name: 'Marketing Technology',
+    description: 'Gen AI tool deployment, marketer access, and workflow tool efficiency',
+    questions: [
+      {
+        text: 'How many gen AI tools are approved and deployed across the entire function today?',
+        answers: [
+          'None — no gen AI tools have been officially deployed',
+          '1–3 tools, with limited scale of deployment and without full capability unlocked for teams',
+          '3–5 tools with at least 1 general purpose tool scaled across marketing, each with defined product owners, but only certain roles have full capability unlocked',
+          '5–10 tools, with a few scaled across marketing, defined product owners and use cases, with full capability unlocked for those that need it',
+          '10+ tools, with several scaled across marketing, defined product owners and use cases, with full capability unlocked for those that need it'
+        ]
+      },
+      {
+        text: 'Do marketers have access to the tools and features they need to do their jobs effectively?',
+        answers: [
+          'Significant gaps exist — marketers are regularly blocked by missing tools or features, and workarounds are common',
+          'Most essential tools are available, but key features are frequently locked down due to licensing tiers, IT policy, or budget constraints',
+          'Core tools and features are accessible to most, but access isn\'t consistently matched to role — some people have too little, others have more than they need',
+          'Tool and feature access is well-matched to most roles, with a clear process for requesting exceptions when gaps arise',
+          'Access is fully optimized by role — the right tools and features are available to the right people, and the stack is regularly reviewed to stay aligned with evolving needs'
+        ]
+      },
+      {
+        text: 'How much tool-switching do marketers experience to complete a typical workflow?',
+        answers: [
+          'Marketers regularly move between many disconnected tools to complete a single workflow, with significant manual handoffs at each step',
+          'Some workflows require heavy tool-switching, but others are more contained — it varies significantly by team or task',
+          'Tool-switching is common but expected — most marketers have adapted their working style around it',
+          'Most workflows can be completed within a small number of tools with minimal manual human handoffs between them',
+          'Workflows are largely contained within connected platforms — tool-switching is the exception, not the norm'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'ethics',
+    name: 'Responsibility & Ethical Use',
+    description: 'AI governance policies, responsible use training, and output accountability',
+    questions: [
+      {
+        text: 'Does an AI usage policy exist that gives marketers clear guardrails?',
+        answers: [
+          'No policy exists — AI usage is currently ungoverned',
+          'A policy is in draft or exists only as a legal/compliance document not intended for marketers',
+          'A marketer-facing policy exists but is written in technical language, hard to find, and rarely referenced',
+          'A clear, plain-English policy exists, has been actively communicated, and most marketers are aware of it',
+          'A plain-English policy with role-specific guidance and practical examples is widely used, easy to find, and regularly updated as tools evolve'
+        ]
+      },
+      {
+        text: 'Have marketers been trained on responsible AI use?',
+        answers: [
+          'No training exists — marketers are left to figure it out on their own',
+          'Informal guidance has been shared (e.g., a Slack post or all-hands mention) but no structured training exists',
+          'Training materials exist and have been shared, but completion is voluntary and not tracked',
+          'Structured AI usage training has been delivered to all relevant marketers, with completion tracked',
+          'Mandatory training is in place, regularly refreshed as the policy evolves, with competency tracked at a role level'
+        ]
+      },
+      {
+        text: 'Is there an accountability mechanism to catch problems in AI outputs before they reach the market?',
+        answers: [
+          'Accountability is entirely informal — individuals self-review their own work with no shared standard or criteria',
+          'Some teams have developed their own informal review practices, but there\'s no consistency across the function',
+          'A shared review process exists but wasn\'t designed with AI-specific risks in mind (e.g., hallucination, bias, compliance) and coverage is inconsistent',
+          'A defined review process exists for most AI-assisted outputs, with clear ownership and AI-specific criteria (accuracy, bias, brand safety, compliance)',
+          'A comprehensive accountability framework is embedded in the workflow — covering all AI outputs, with defined owners, escalation paths, AI-assisted checks, and regular audits'
+        ]
+      }
+    ]
+  }
+];
+
+const TIER_LEVELS = [
+  { min: 0,  max: 20,  key: 'nascent',     label: 'Nascent',     desc: 'Just starting the AI journey' },
+  { min: 21, max: 40,  key: 'emerging',    label: 'Emerging',    desc: 'Building early foundations' },
+  { min: 41, max: 60,  key: 'developing',  label: 'Developing',  desc: 'Gaining real momentum' },
+  { min: 61, max: 89,  key: 'advanced',    label: 'Advanced',    desc: 'Scaling AI capabilities' },
+  { min: 90, max: 100, key: 'leading',     label: 'Leading',     desc: 'AI-native organization' }
+];
+
+const CATEGORY_COMMENTARY = {
+  leadership: [
+    'AI transformation has not yet reached the leadership agenda. Without executive sponsorship, a clear strategy, dedicated budget, and meaningful incentives, AI initiatives will remain fragmented experiments that struggle to gain traction. This is your most urgent priority—nothing else will move without it.',
+    'Early sponsorship signals exist but the foundations are not yet solid. Budget is limited, strategy is fragmented, and incentives are informal at best. Securing a visible C-level champion, translating support into a formal mandate, and allocating a protected budget should be the immediate focus.',
+    'Leadership alignment is taking shape, but gaps in strategy communication, budget commitment, or incentive design are limiting progress. Formalizing the AI strategy with clear business outcomes, protecting multi-year investment, and introducing structured incentives will unlock the next level.',
+    'Strong leadership foundations are in place across sponsorship, strategy, budget, and incentives. The focus now should be tightening the connection between AI investment and measurable business outcomes—and ensuring performance accountability is visible and consistent across the organization.',
+    'Exceptional leadership alignment. Committed executive sponsorship, a clear outcome-oriented strategy, protected multi-year budget, and real performance incentives create the ideal conditions for AI transformation at scale. Sustain this through transparent impact reporting and proactive communication.'
+  ],
+  adoption: [
+    'Gen AI adoption is in its earliest stages. Most of the team is not using tools regularly, and use cases remain basic or nonexistent across both employees and leadership. A structured activation program—starting with high-value, low-complexity use cases and visible leadership modeling—is essential to building momentum.',
+    'Occasional use is emerging but habits are not yet formed and use cases remain shallow. Leadership is not yet modeling the behavior the organization needs to see. Identifying internal champions, documenting quick-win use cases, and having leaders visibly share how they use AI daily will accelerate broader uptake.',
+    'A portion of the team is using gen AI with some regularity, but depth of use is uneven. Employees are using AI for basic tasks while more advanced applications remain rare. Bridging this gap through curated use-case playbooks and structured skill-building will drive meaningful productivity gains.',
+    'Regular AI use is becoming normalized and use cases are advancing beyond the basics. Leadership is demonstrating meaningful proficiency. The next frontier is moving from individual productivity gains to team-level workflow integration and starting to measure the tangible impact on output quality and throughput.',
+    'Exceptional adoption and proficiency across the function. AI is genuinely embedded in how people work at all levels, with leadership actively modeling advanced use. Focus on building shared workflow libraries, driving agent-based automation, and rigorously measuring the compounding ROI of AI-powered work.'
+  ],
+  change: [
+    'The human infrastructure for AI transformation is effectively absent. There is no formal change program, no feedback mechanisms, and the culture is resistant to the kind of transformational change AI requires. Without addressing this, even well-funded AI programs will stall. This is a critical and urgent gap.',
+    'Informal change efforts and pockets of cultural openness exist, but they are fragile and uncoordinated. There is no feedback loop and no formal support structure. Appointing a dedicated change lead, standing up a basic community forum, and working to shift culture toward appetite for change are high-leverage next steps.',
+    'Change management foundations are forming, but formal program structure is inconsistent and community infrastructure is still developing. The culture has some openness to change but past failures have created hesitancy. Centralizing the change program, building a robust feedback loop, and acknowledging past learnings openly will build trust and momentum.',
+    'A solid change capability exists with formal program structure, active community forums, and a culture that broadly supports transformation. The priority now is deepening the feedback loop—connecting tool telemetrics, qualitative surveys, and change program insights—and sustaining cultural momentum through visible wins.',
+    'Change capability is a genuine competitive advantage. A formal, centralized program with dedicated leadership and function-level champions, combined with a culture built on innovation and transformation success, creates ideal conditions for AI at scale. Continue to invest in this infrastructure—it is what will separate you from the competition.'
+  ],
+  process: [
+    'Process documentation is minimal, making AI augmentation extremely difficult. AI requires clear, consistent inputs to deliver value—and without documented workflows, automation and augmentation are nearly impossible to scale. Documenting and standardizing core processes is a foundational prerequisite before significant AI investment.',
+    'Some process documentation exists, but significant gaps limit the ability to systematically automate or augment work with AI. A focused documentation sprint targeting the highest-volume, most repetitive processes is a practical and high-ROI starting point.',
+    'Process maturity is developing. You have a workable foundation but inconsistent documentation and communication is creating inefficiencies that will compound as AI integration deepens. Improving process discoverability, keeping documentation current, and formalizing change communication will meaningfully improve AI readiness.',
+    'Strong process foundations support AI integration. Most key workflows are documented and reasonably well understood across the organization. The priority now is ensuring process changes are managed with the same rigor as technical changes—and beginning to map processes to AI augmentation opportunities.',
+    'Excellent process maturity. Comprehensive, current documentation and a strong communication culture create ideal conditions for AI augmentation at scale. Focus on systematically identifying which processes have the highest AI leverage and building out those integrations to drive compounding productivity gains.'
+  ],
+  data: [
+    'Data infrastructure is a significant barrier to AI transformation. Siloed, ungoverned data makes it nearly impossible to deliver personalized AI-powered experiences or reliable analytics. Addressing foundational data connectivity and governance is a prerequisite for meaningful AI progress.',
+    'Data integration efforts are underway but fragility and inconsistency limit their usefulness for AI applications. Investing in a foundational data layer, establishing a basic taxonomy, and putting governance standards in place should be prioritized alongside AI capability development.',
+    'Data readiness is progressing but gaps in integration coverage and taxonomy consistency are creating friction for AI use cases. Closing these gaps—particularly around unified definitions across systems—will unlock significant analytical and personalization capabilities that are currently out of reach.',
+    'Strong data foundations support advanced AI applications. The focus should now shift to automation—automated governance, real-time data quality monitoring, and expanding the reach of your unified data layer to cover remaining edge cases and secondary systems.',
+    'Exceptional data readiness. Clean, connected, governed data across all marketing systems creates the ideal foundation for sophisticated AI applications. Continue to invest in real-time capabilities, advanced governance automation, and first-party data strategies that reduce dependency on third-party sources.'
+  ],
+  martech: [
+    'The martech stack lacks the consistency, governance, and accessibility needed to support AI transformation at scale. Shadow tool usage and fragmented access create risk and limit the ability to measure impact. Establishing a governed, approved tool set and improving access is an immediate priority.',
+    'Some shared tools exist but stack fragmentation and restricted access are limiting AI impact. Developing a reference architecture, rationalizing redundant tools, and creating a clear approval and onboarding process for new AI tools will establish the foundation for a coherent, scalable stack.',
+    'Martech consistency is developing but gaps in standardization and team access are creating friction. Some teams are well-served while others lack access to the tools they need. Establishing clearer governance, improving self-service access, and enforcing the recommended stack more consistently will accelerate impact.',
+    'A largely consistent, well-governed stack with good access levels creates a solid foundation for AI integration. The next priority is ensuring your AI tools are connected—so outputs from one feed intelligently into others—and that the impact of the stack is being actively measured.',
+    'Excellent martech maturity. A well-governed, accessible, standardized stack—with approved gen AI tools at scale—is a genuine enabler of AI transformation. Focus on deepening integration across the stack, building connected workflows between tools, and measuring the compounding value of your AI ecosystem.'
+  ],
+  ethics: [
+    'AI governance is effectively absent, creating meaningful brand, legal, compliance, and ethical risk. As AI output volumes grow, ungoverned usage can lead to bias, IP issues, regulatory exposure, and brand damage. Establishing even a basic policy and review process is an immediate priority.',
+    'Early governance thinking is present but has not yet been formalized, communicated, or operationalized. Creating and sharing a basic AI usage policy—written in plain English, specific to marketers—is an important and achievable near-term milestone that will meaningfully reduce risk.',
+    'A governance foundation exists but limited communication, inconsistent output review, and gaps in ethics training are creating risk exposure. Making the policy more accessible, establishing a consistent review process for AI content, and delivering basic ethics training will close the most significant gaps.',
+    'Solid governance foundations with good policy communication and structured output review. The next evolution is building compliance and bias review into automated workflows—moving from a reactive, checklist-based model to a proactive, systematic governance program.',
+    'Exemplary AI governance. Comprehensive policy, regular ethics training, and a multi-layer output review process covering bias, fairness, compliance, and brand safety represent genuine responsible AI leadership. This positions the organization well as regulatory requirements tighten and stakeholder scrutiny increases.'
+  ]
+};
+
+const EXEC_SUMMARIES = {
+  beginning: (profile, scores) => {
+    const lowCats = getLowestCategories(scores, 2).map(c => c.name).join(' and ');
+    return `<strong>${profile.company}</strong> is in the earliest stages of AI transformation. Across the 7 dimensions assessed, the organization has not yet built the foundational capabilities—leadership alignment, adoption infrastructure, data readiness, and governance—needed to pursue AI at scale. Particular attention is required in <strong>${lowCats}</strong>. The path forward starts with securing executive commitment, establishing a clear AI strategy, and identifying 2–3 high-value pilot use cases that can demonstrate impact and build organizational confidence.`;
+  },
+  developing: (profile, scores) => {
+    const lowCats = getLowestCategories(scores, 2).map(c => c.name).join(' and ');
+    return `<strong>${profile.company}</strong> has taken early, meaningful steps toward AI transformation. Green shoots of adoption, nascent strategy, and developing governance are visible—but foundational gaps remain that will limit the organization's ability to scale. The areas most in need of investment are <strong>${lowCats}</strong>. With focused effort on building the structural foundations—leadership alignment, process documentation, and data readiness—the organization is well-positioned to accelerate meaningfully in the near term.`;
+  },
+  progressing: (profile, scores) => {
+    const lowCats = getLowestCategories(scores, 2).map(c => c.name).join(' and ');
+    return `<strong>${profile.company}</strong> is making genuine progress on AI transformation. Capabilities are emerging across multiple dimensions, and the organization has moved past the exploratory stage into structured implementation. The most significant opportunities for acceleration lie in <strong>${lowCats}</strong>. Addressing these gaps while continuing to build on existing strengths will create the conditions for scaled, measurable impact.`;
+  },
+  advanced: (profile, scores) => {
+    const lowCats = getLowestCategories(scores, 2).map(c => c.name).join(' and ');
+    return `<strong>${profile.company}</strong> demonstrates strong AI transformation capabilities across the board. Leadership alignment, adoption momentum, and foundational infrastructure are well-established. The priority now is optimizing the weaker areas—particularly <strong>${lowCats}</strong>—while transitioning from isolated AI initiatives to connected, enterprise-wide programs that deliver measurable business outcomes at scale.`;
+  },
+  leading: (profile, scores) => {
+    const highCats = getHighestCategories(scores, 2).map(c => c.name).join(' and ');
+    return `<strong>${profile.company}</strong> is operating at the leading edge of AI transformation maturity. Across nearly all dimensions, the organization has built the capabilities, culture, and infrastructure to pursue AI at scale. Standout strengths include <strong>${highCats}</strong>. The imperative now is sustaining this advantage through continuous innovation, rigorous measurement of business impact, and using your mature capabilities to drive competitive differentiation.`;
+  }
+};
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let state = {
+  screen: 'welcome',
+  profile: { company: '', role: '', title: '', location: '' },
+  currentCategoryIndex: 0,
+  answers: {} // key: `${catIndex}_${qIndex}`, value: 0-4
+};
+
+// ─── NAVIGATION ────────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(`screen-${name}`).classList.add('active');
+  state.screen = name;
+  window.scrollTo(0, 0);
+}
+
+// ─── SETUP ─────────────────────────────────────────────────────────────────
+function handleSetupSubmit(e) {
+  e.preventDefault();
+  const company  = document.getElementById('f-company').value.trim();
+  const role     = document.getElementById('f-role').value;
+  const title    = document.getElementById('f-title').value;
+  const location = document.getElementById('f-location').value;
+  let valid = true;
+  const show = (id, show) => document.getElementById(id).classList.toggle('visible', show);
+  if (!company)  { show('e-company', true);  valid = false; } else show('e-company', false);
+  if (!role)     { show('e-role', true);     valid = false; } else show('e-role', false);
+  if (!title)    { show('e-title', true);    valid = false; } else show('e-title', false);
+  if (!location) { show('e-location', true); valid = false; } else show('e-location', false);
+  if (!valid) return;
+  state.profile = { company, role, title, location };
+  state.currentCategoryIndex = 0;
+  state.answers = {};
+  showScreen('assessment');
+  renderAssessmentCategory();
+}
+
+// ─── ASSESSMENT ────────────────────────────────────────────────────────────
+function renderAssessmentCategory() {
+  const ci = state.currentCategoryIndex;
+  const cat = CATEGORIES[ci];
+
+  // Populate company name in sidebar and results header
+  const companyName = state.profile.company || '';
+  const sidebarCo = document.getElementById('sidebar-company-name');
+  if (sidebarCo) sidebarCo.textContent = companyName;
+  const resultsCo = document.getElementById('results-header-company');
+  if (resultsCo) resultsCo.textContent = companyName;
+
+  // Sidebar
+  const navList = document.getElementById('sidebar-nav-list');
+  navList.innerHTML = '';
+  CATEGORIES.forEach((c, i) => {
+    const allAnswered = c.questions.every((_, qi) => state.answers[`${i}_${qi}`] !== undefined);
+    const isCurrent = i === ci;
+    const isCompleted = allAnswered && !isCurrent;
+    const li = document.createElement('li');
+    li.className = `sidebar-nav-item ${isCurrent ? 'current' : ''} ${isCompleted ? 'completed' : ''}`;
+    if (isCompleted) li.onclick = () => { state.currentCategoryIndex = i; renderAssessmentCategory(); };
+    li.innerHTML = `
+      <div class="sidebar-nav-indicator">
+        ${isCompleted ? '<span class="check">✓</span>' : (i + 1)}
+      </div>
+      <div class="sidebar-nav-text">${c.name}</div>`;
+    navList.appendChild(li);
+  });
+
+  // Progress bar
+  const totalQ = CATEGORIES.reduce((s, c) => s + c.questions.length, 0);
+  const answeredQ = Object.keys(state.answers).length;
+  const fillEl = document.getElementById('sidebar-progress-fill');
+  if (fillEl) fillEl.style.width = `${(answeredQ / totalQ) * 100}%`;
+
+  // Main content
+  const content = document.getElementById('assessment-content');
+  content.innerHTML = `
+    <div class="category-eyebrow">
+      <span class="category-number">Category ${ci + 1} of ${CATEGORIES.length}</span>
+      <span class="category-number">·</span>
+      <span class="category-name-tag">${cat.name}</span>
+    </div>
+    <h2 class="category-title">${cat.name}</h2>
+    <p class="category-description">${cat.description}</p>
+    ${cat.questions.map((q, qi) => renderQuestion(ci, qi, q)).join('')}
+  `;
+  content.scrollTop = 0;
+
+  // Footer
+  const answeredInCat = cat.questions.filter((_, qi) => state.answers[`${ci}_${qi}`] !== undefined).length;
+  document.getElementById('footer-progress-text').innerHTML =
+    `<strong>${ci + 1} / ${CATEGORIES.length}</strong> categories &nbsp;·&nbsp; <strong>${answeredInCat} / ${cat.questions.length}</strong> answered`;
+  document.getElementById('btn-prev').style.display = ci === 0 ? 'none' : '';
+  document.getElementById('btn-next').textContent = ci === CATEGORIES.length - 1 ? 'See My Results →' : 'Continue →';
+  document.getElementById('unanswered-warning').classList.remove('visible');
+  updateNextButton();
+
+  window.scrollTo(0, 0);
+}
+
+function renderQuestion(ci, qi, q) {
+  const LEVEL_LABELS = ['Beginning', 'Developing', 'Progressing', 'Advanced', 'Leading'];
+  return `
+    <div class="question-block" id="qblock-${ci}-${qi}">
+      <div class="question-number">Question ${qi + 1}</div>
+      <div class="question-text">${q.text}</div>
+      <div class="answer-list">
+        ${q.answers.map((a, ai) => `
+          <div class="answer-card ${state.answers[`${ci}_${qi}`] === ai ? 'selected' : ''}"
+               onclick="selectAnswer(${ci}, ${qi}, ${ai})" id="answer-${ci}-${qi}-${ai}">
+            <div class="answer-radio">
+              <div class="answer-radio-dot"></div>
+            </div>
+            <div class="answer-text">${a}</div>
+            <div class="answer-level">${LEVEL_LABELS[ai]}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function updateNextButton() {
+  const ci = state.currentCategoryIndex;
+  const cat = CATEGORIES[ci];
+  const allAnswered = cat.questions.every((_, qi) => state.answers[`${ci}_${qi}`] !== undefined);
+  document.getElementById('btn-next').disabled = !allAnswered;
+}
+
+function selectAnswer(ci, qi, ai) {
+  state.answers[`${ci}_${qi}`] = ai;
+  // Update UI for this question
+  const cat = CATEGORIES[ci];
+  cat.questions[qi].answers.forEach((_, idx) => {
+    const el = document.getElementById(`answer-${ci}-${qi}-${idx}`);
+    if (el) el.classList.toggle('selected', idx === ai);
+  });
+  // Update footer progress
+  const answeredInCat = cat.questions.filter((_, qi2) => state.answers[`${ci}_${qi2}`] !== undefined).length;
+  document.getElementById('footer-progress-text').innerHTML =
+    `<strong>${ci + 1} / ${CATEGORIES.length}</strong> categories &nbsp;·&nbsp; <strong>${answeredInCat} / ${cat.questions.length}</strong> answered`;
+  document.getElementById('unanswered-warning').classList.remove('visible');
+  // Update sidebar progress
+  const totalQ = CATEGORIES.reduce((s, c) => s + c.questions.length, 0);
+  const answeredQ = Object.keys(state.answers).length;
+  const fillEl = document.getElementById('sidebar-progress-fill');
+  if (fillEl) fillEl.style.width = `${(answeredQ / totalQ) * 100}%`;
+  // Auto-scroll to next unanswered question
+  const nextUnansweredQi = cat.questions.findIndex((_, qi2) => qi2 > qi && state.answers[`${ci}_${qi2}`] === undefined);
+  if (nextUnansweredQi !== -1) {
+    const el = document.getElementById(`qblock-${ci}-${nextUnansweredQi}`);
+    if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+  }
+  updateNextButton();
+}
+
+function prevCategory() {
+  if (state.currentCategoryIndex > 0) {
+    state.currentCategoryIndex--;
+    renderAssessmentCategory();
+  }
+}
+
+function nextCategory() {
+  const ci = state.currentCategoryIndex;
+  const cat = CATEGORIES[ci];
+  const unanswered = cat.questions.some((_, qi) => state.answers[`${ci}_${qi}`] === undefined);
+  if (unanswered) {
+    document.getElementById('unanswered-warning').classList.add('visible');
+    // Scroll to first unanswered
+    const firstUnansweredQi = cat.questions.findIndex((_, qi) => state.answers[`${ci}_${qi}`] === undefined);
+    const el = document.getElementById(`qblock-${ci}-${firstUnansweredQi}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  if (ci === CATEGORIES.length - 1) {
+    generateAndShowResults();
+  } else {
+    state.currentCategoryIndex++;
+    renderAssessmentCategory();
+  }
+}
+
+// ─── SCORING ───────────────────────────────────────────────────────────────
+function calculateCategoryScore(catIndex) {
+  const cat = CATEGORIES[catIndex];
+  let total = 0;
+  cat.questions.forEach((_, qi) => {
+    const val = state.answers[`${catIndex}_${qi}`];
+    total += (val !== undefined ? val : 0);
+  });
+  return Math.round((total / (cat.questions.length * 4)) * 100);
+}
+
+function calculateAllScores() {
+  const scores = {};
+  CATEGORIES.forEach((cat, i) => { scores[cat.id] = calculateCategoryScore(i); });
+  // Group 1 (60%): leadership, change, process, data — 15% each
+  // Group 2 (40%): adoption, martech, ethics — 13.33% each
+  const GROUP1 = ['leadership', 'change', 'process', 'data'];
+  const GROUP2 = ['adoption', 'martech', 'ethics'];
+  const g1Avg = GROUP1.reduce((s, id) => s + scores[id], 0) / GROUP1.length;
+  const g2Avg = GROUP2.reduce((s, id) => s + scores[id], 0) / GROUP2.length;
+  scores.overall = Math.round(g1Avg * 0.6 + g2Avg * 0.4);
+  return scores;
+}
+
+function getTier(score) {
+  return TIER_LEVELS.find(t => score >= t.min && score <= t.max) || TIER_LEVELS[0];
+}
+
+// Shared ranking used by exec summary AND priority recommendations so they always agree.
+// Sort order: 1) lowest dimension score  2) most questions answered at level ≤3  3) explicit tiebreak order
+const PRIORITY_TIEBREAK = ['data', 'leadership', 'adoption', 'process', 'change', 'martech', 'ethics'];
+
+function rankCategories(scores) {
+  return CATEGORIES.map((c, ci) => {
+    const weakCount = c.questions.reduce((n, _, qi) => {
+      const ans = state.answers[`${ci}_${qi}`];
+      return n + (ans !== undefined && ans <= 2 ? 1 : 0);
+    }, 0);
+    return { ...c, score: scores[c.id], weakCount };
+  }).sort((a, b) => {
+    if (a.score !== b.score) return a.score - b.score;
+    if (b.weakCount !== a.weakCount) return b.weakCount - a.weakCount;
+    return PRIORITY_TIEBREAK.indexOf(a.id) - PRIORITY_TIEBREAK.indexOf(b.id);
+  });
+}
+
+function getLowestCategories(scores, n) {
+  return rankCategories(scores).slice(0, n);
+}
+
+function getHighestCategories(scores, n) {
+  return CATEGORIES
+    .map(c => ({ ...c, score: scores[c.id] }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, n);
+}
+
+// ─── GOOGLE SHEETS CONFIG ──────────────────────────────────────────────────
+// Paste your Google Apps Script Web App URL below to enable response logging.
+// Leave as empty string '' to disable.
+const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby5jWzMYcGqAn829MDUZJ1SwT5ceLFHXaLEEAa62o5toP_cUgJTLYsKLT9t67p8lWvx/exec';
+
+// Short labels for each question column in the sheet
+const Q_SHEET_LABELS = {
+  leadership: ['Sponsorship', 'Budget', 'Strategy', 'Program Ops', 'Incentives'],
+  adoption:   ['Frequency', 'Employee Use', 'Leadership Use'],
+  change:     ['Change Mgmt', 'Feedback Forums', 'Culture'],
+  process:    ['Documentation', 'Process Detail', 'Governance', 'Process Changes'],
+  data:       ['Interoperability', 'Taxonomy', 'Data Governance'],
+  martech:    ['Gen AI Tools', 'Tool Access', 'Tool Switching'],
+  ethics:     ['Usage Policy', 'Responsible Use Training', 'Output Accountability'],
+};
+const CAT_SHORT = {
+  leadership: 'Leadership', adoption: 'Gen AI', change: 'Change',
+  process: 'Process', data: 'Data', martech: 'Martech', ethics: 'Ethics'
+};
+
+function submitToSheet(scores) {
+  if (!SHEET_WEBHOOK_URL) return;
+
+  const row = {
+    'Timestamp':       new Date().toISOString(),
+    'Company':         state.profile.company,
+    'Role':            state.profile.role,
+    'Title / Level':   state.profile.title,
+    'Country':         state.profile.location,
+    'Overall Score':   scores.overall,
+    'Overall Tier':    getTier(scores.overall).label,
+  };
+
+  // Category scores + tiers
+  CATEGORIES.forEach(cat => {
+    row[`${CAT_SHORT[cat.id]} Score`] = scores[cat.id];
+    row[`${CAT_SHORT[cat.id]} Tier`]  = getTier(scores[cat.id]).label;
+  });
+
+  // Individual question answers (selected answer text)
+  CATEGORIES.forEach((cat, ci) => {
+    cat.questions.forEach((q, qi) => {
+      const label = Q_SHEET_LABELS[cat.id]?.[qi] || `Q${qi + 1}`;
+      const val = state.answers[`${ci}_${qi}`];
+      row[`${CAT_SHORT[cat.id]} – ${label}`] = val !== undefined ? q.answers[val] : '';
+    });
+  });
+
+  // Fire-and-forget — send as text/plain to avoid CORS preflight with Apps Script
+  try {
+    const sent = navigator.sendBeacon(
+      SHEET_WEBHOOK_URL,
+      new Blob([JSON.stringify(row)], { type: 'text/plain' })
+    );
+    if (!sent) throw new Error('sendBeacon failed');
+  } catch (e) {
+    fetch(SHEET_WEBHOOK_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(row),
+    }).catch(() => {});
+  }
+}
+
+// ─── TEAM DATA ─────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'mja_ai_assessment_results';
+
+function saveResultsToStorage(scores) {
+  let existing = [];
+  try { existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) {}
+  existing.push({ ts: Date.now(), company: state.profile.company, scores });
+  if (existing.length > 100) existing = existing.slice(-100);
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(existing)); } catch(e) {}
+}
+
+function getTeamAverages() {
+  let data = [];
+  try { data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) {}
+  if (data.length < 2) return null; // Need at least 2 responses for comparison
+  const avgs = {};
+  const keys = [...CATEGORIES.map(c => c.id), 'overall'];
+  keys.forEach(k => {
+    const vals = data.map(d => d.scores[k]).filter(v => v !== undefined);
+    avgs[k] = vals.length ? Math.round(vals.reduce((s, v) => s + v, 0) / vals.length) : 0;
+  });
+  return { averages: avgs, count: data.length };
+}
+
+// ─── SAVE REPORT ───────────────────────────────────────────────────────────
+function saveReport() {
+  const company = (state.profile.company || 'Report').replace(/[^a-z0-9]/gi, '-');
+  const date = new Date().toISOString().slice(0, 10);
+  const filename = `MJA-AI-Maturity-${company}-${date}.html`;
+
+  // Snapshot current rendered results HTML
+  const bodyHTML = document.getElementById('results-body').innerHTML;
+
+  // Grab the embedded stylesheet
+  const css = document.querySelector('style').textContent;
+
+  // Font and CDN links
+  const headLinks = `
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">`;
+
+  const standalone = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Maturity Report — ${state.profile.company}</title>
+  ${headLinks}
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    ${css}
+    body { background: var(--off-white); }
+    .report-wrap { max-width: 900px; margin: 0 auto; }
+    .report-print-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 32px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    @media print { .report-print-bar { display: none !important; } }
+    /* All dimension cards fully expanded in saved report */
+    .category-score-body {
+      max-height: none !important;
+      padding: 0 24px 24px !important;
+      overflow: visible !important;
+    }
+    .cat-expand-icon { display: none !important; }
+    @media print {
+      .category-score-body {
+        max-height: none !important;
+        padding: 0 24px 24px !important;
+        overflow: visible !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="report-print-bar">
+    <button class="btn btn-secondary" onclick="window.print()">Print Report</button>
+  </div>
+  <div class="report-wrap">
+    ${bodyHTML}
+  </div>
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.cat-score-fill').forEach(el => {
+        const w = el.getAttribute('data-width');
+        if (w) el.style.width = w + '%';
+      });
+    }, 150);
+  <\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([standalone], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ─── RESULTS ───────────────────────────────────────────────────────────────
+function generateAndShowResults() {
+  const scores = calculateAllScores();
+  saveResultsToStorage(scores);
+  submitToSheet(scores);
+
+  // Populate company name in results header
+  const resultsCo = document.getElementById('results-header-company');
+  if (resultsCo) resultsCo.textContent = state.profile.company || '';
+  const tier = getTier(scores.overall);
+  const teamData = getTeamAverages();
+
+  // Build recommendations based on lowest scoring categories
+  const sortedCats = CATEGORIES.map(c => ({ ...c, score: scores[c.id] })).sort((a, b) => a.score - b.score);
+  const recos = buildRecommendations(sortedCats, scores);
+
+  const body = document.getElementById('results-body');
+  body.innerHTML = `
+    <!-- HERO -->
+    <div class="results-hero">
+      <div class="results-hero-inner">
+        <div class="results-eyebrow">AI Transformation Maturity Assessment</div>
+        <div class="results-score-row">
+          <div>
+            <div class="results-score-big">${scores.overall}</div>
+            <div class="results-score-label">Overall Score (out of 100)</div>
+          </div>
+          <div>
+            <div class="results-tier-badge tier-hero-${tier.key}">${tier.label}</div>
+            <div class="results-tier-text">${tier.desc}</div>
+            <div class="results-tier-sub">Across 7 capability dimensions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="results-section">
+      <div class="results-section-title">Executive Summary</div>
+      <div class="results-card">
+        <p class="exec-summary-text">
+          ${EXEC_SUMMARIES[tier.key](state.profile, scores)}
+        </p>
+      </div>
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="results-section" style="padding-top:0">
+      <div class="results-section-title">Critical Path Recommendations</div>
+      <div class="reco-grid">
+        ${[
+          { items: recos.short, label: recos.shortLabel, color: '#dc2626', num: 1 },
+          { items: recos.medium, label: recos.mediumLabel, color: '#d97706', num: 2 },
+          { items: recos.long, label: recos.longLabel, color: '#059669', num: 3 }
+        ].map(b => `
+        <div class="reco-card">
+          <div class="reco-card-header">
+            <div class="reco-timeframe-dot" style="background:${b.color}"></div>
+            <div class="reco-timeframe">Priority ${b.num}</div>
+          </div>
+          <div class="reco-card-title">${b.label}</div>
+          <ul class="reco-list">${b.items.map(r => '<li>' + r + '</li>').join('')}</ul>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- CATEGORY SCORES -->
+    <div class="results-section" style="padding-top:0">
+      <div class="results-section-title">Dimension Scores &amp; Analysis</div>
+      ${CATEGORIES.map((cat, i) => renderCategoryScoreCard(cat, scores[cat.id], i)).join('')}
+    </div>
+
+    <!-- TEAM COMPARISON -->
+    <div class="results-section" style="padding-top:0">
+      <div class="results-section-title">Team Comparison</div>
+      <div class="comparison-container">
+        ${renderTeamComparison(scores, teamData)}
+      </div>
+    </div>
+
+    <!-- REPORT ACTIONS -->
+    <div class="report-actions-row no-print">
+      <button class="btn btn-secondary" onclick="saveReport()">Save Report</button>
+      <button class="btn btn-secondary" onclick="window.print()">Print Report</button>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="results-footer">
+      <div>
+        <div class="results-footer-brand">MJA Consulting</div>
+        <div class="results-footer-sub">AI Transformation Maturity Assessment · ${new Date().toLocaleDateString('en-US', {month:'long', year:'numeric'})}</div>
+      </div>
+    </div>
+  `;
+
+  showScreen('results');
+
+  // Animate score bars after render
+  setTimeout(() => {
+    document.querySelectorAll('.cat-score-fill').forEach(el => {
+      const w = el.getAttribute('data-width');
+      if (w) el.style.width = w + '%';
+    });
+  }, 200);
+
+  // Render chart if team data exists
+  if (teamData && teamData.count >= 2) {
+    setTimeout(() => renderComparisonChart(scores, teamData), 300);
+  }
+}
+
+function renderCategoryScoreCard(cat, score, catIndex) {
+  const tier = getTier(score);
+  const commentary = getCategoryCommentary(cat.id, score);
+  const LEVEL_LABELS = ['Beginning', 'Developing', 'Progressing', 'Advanced', 'Leading'];
+  const questionScores = cat.questions.map((q, qi) => ({
+    text: q.text,
+    value: (state.answers[`${catIndex}_${qi}`] !== undefined ? state.answers[`${catIndex}_${qi}`] + 1 : 0)
+  }));
+
+  return `
+    <div class="category-score-card" id="cat-card-${cat.id}">
+      <div class="category-score-header" onclick="toggleCategoryCard('${cat.id}')">
+        <div class="cat-score-number score-${tier.key}">${score}</div>
+        <div class="cat-score-bar-container">
+          <div class="cat-score-name">${cat.name}</div>
+          <div class="cat-score-bar">
+            <div class="cat-score-fill bar-${tier.key}" data-width="${score}" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="cat-score-tier bg-${tier.key}">${tier.label}</div>
+        <div class="cat-expand-icon">▾</div>
+      </div>
+      <div class="category-score-body">
+        <div class="category-commentary">${commentary}</div>
+        <div class="category-question-scores">
+          ${questionScores.map(qs => `
+            <div class="q-score-row">
+              <div class="q-score-text">${qs.text}</div>
+              <div class="q-score-dots">
+                ${[1,2,3,4,5].map(v => `<div class="q-dot ${qs.value >= v ? 'filled' : ''}"></div>`).join('')}
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);min-width:80px;text-align:right">${LEVEL_LABELS[qs.value-1] || '—'}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function toggleCategoryCard(id) {
+  const card = document.getElementById(`cat-card-${id}`);
+  card.classList.toggle('expanded');
+}
+
+function getCategoryCommentary(catId, score) {
+  const tier = getTier(score);
+  const tierIndex = TIER_LEVELS.indexOf(tier);
+  return CATEGORY_COMMENTARY[catId]?.[tierIndex] || '';
+}
+
+function renderTeamComparison(scores, teamData) {
+  if (!teamData || teamData.count < 2) {
+    return `<div class="comparison-no-data">
+      <strong>Team comparison not yet available</strong>
+      When other members of your leadership team complete this assessment, you'll see how your scores compare to the group average here. Share the link to build your team picture.
+    </div>`;
+  }
+
+  const avg = teamData.averages;
+  return `
+    <div style="margin-bottom:20px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">Your scores vs. team average</div>
+      <div style="font-size:13px;color:var(--text-muted)">Based on ${teamData.count} completed assessments from your organization</div>
+    </div>
+    <div class="comparison-chart-wrap">
+      <div class="comparison-chart">
+        <canvas id="comparison-chart" width="380" height="380"></canvas>
+      </div>
+      <div class="comparison-table">
+        <div class="comparison-table-header">
+          <div class="comparison-col-header">Dimension</div>
+          <div class="comparison-col-header">You</div>
+          <div class="comparison-col-header">Team Avg</div>
+          <div class="comparison-col-header">Diff</div>
+        </div>
+        ${CATEGORIES.map(cat => {
+          const myScore = scores[cat.id];
+          const avgScore = avg[cat.id] || 0;
+          const diff = myScore - avgScore;
+          const diffClass = diff > 3 ? 'diff-pos' : diff < -3 ? 'diff-neg' : 'diff-neutral';
+          const diffText = diff > 0 ? `+${diff}` : `${diff}`;
+          return `<div class="comparison-table-row">
+            <div class="comparison-cat-name">${cat.name}</div>
+            <div class="comparison-score">${myScore}</div>
+            <div class="comparison-score" style="color:var(--text-secondary)">${avgScore}</div>
+            <div class="comparison-diff ${diffClass}">${diffText}</div>
+          </div>`;
+        }).join('')}
+        <div class="comparison-table-row" style="border-top:2px solid var(--border);margin-top:4px">
+          <div class="comparison-cat-name" style="font-weight:700">Overall</div>
+          <div class="comparison-score" style="font-size:16px">${scores.overall}</div>
+          <div class="comparison-score" style="font-size:16px;color:var(--text-secondary)">${avg.overall || 0}</div>
+          <div class="comparison-diff ${scores.overall - (avg.overall||0) > 3 ? 'diff-pos' : scores.overall - (avg.overall||0) < -3 ? 'diff-neg' : 'diff-neutral'}">
+            ${scores.overall - (avg.overall||0) > 0 ? '+' : ''}${scores.overall - (avg.overall||0)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderComparisonChart(scores, teamData) {
+  const canvas = document.getElementById('comparison-chart');
+  if (!canvas || !teamData) return;
+  const labels = CATEGORIES.map(c => c.name.split(' '));
+  const myData = CATEGORIES.map(c => scores[c.id]);
+  const teamData2 = CATEGORIES.map(c => teamData.averages[c.id] || 0);
+
+  new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'You',
+          data: myData,
+          borderColor: '#1d4ed8',
+          backgroundColor: 'rgba(29, 78, 216, 0.1)',
+          borderWidth: 2,
+          pointBackgroundColor: '#1d4ed8',
+          pointRadius: 4
+        },
+        {
+          label: 'Team Average',
+          data: teamData2,
+          borderColor: '#9ca3af',
+          backgroundColor: 'rgba(156, 163, 175, 0.1)',
+          borderWidth: 2,
+          pointBackgroundColor: '#9ca3af',
+          pointRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 0,
+          max: 100,
+          ticks: { stepSize: 20, font: { size: 10 }, color: '#9ca3af' },
+          grid: { color: '#e4e4e4' },
+          angleLines: { color: '#e4e4e4' },
+          pointLabels: { font: { size: 11, weight: '600' }, color: '#555555' }
+        }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 12 }, boxWidth: 12 } }
+      }
+    }
+  });
+}
+
+// ─── RECOMMENDATIONS ────────────────────────────────────────────────────────
+// Per-question recommendations: each maps 1:1 to a survey question.
+// Three tiers per question tell you what to do next based on current answer:
+//   foundational (answer 1–2) → building (answer 3) → advancing (answer 4)
+//   Answer 5 = no recommendation needed (already at top)
+const QUESTION_RECOS = [
+  // ── 0. Leadership (5 questions) ──────────────────────────────────────────
+  [
+    { // Q0: Executive sponsorship
+      foundational: 'Secure visible CMO-level sponsorship for AI — without executive backing, the program will stall',
+      building: 'Formalize CMO sponsorship into an active change mandate with clear accountability',
+      advancing: 'Engage the CEO to co-sponsor the AI program alongside the CMO, extending the mandate enterprise-wide'
+    },
+    { // Q1: Budget investment
+      foundational: 'Secure a protected annual AI budget — without dedicated funding, initiatives compete for scraps',
+      building: 'Transition to a multi-year AI budget to enable sustained investment and long-range planning',
+      advancing: 'Build a mechanism to scale AI investment dynamically based on demonstrated ROI'
+    },
+    { // Q2: Aligned strategy
+      foundational: 'Develop a unified AI strategy across marketing — fragmented team-level efforts limit collective impact',
+      building: 'Tie the AI strategy directly to specific business outcomes and use it to actively drive roadmap prioritization',
+      advancing: 'Ensure the AI strategy is well-communicated, outcome-driven, and actively informs all roadmap decisions'
+    },
+    { // Q3: Program operationalization
+      foundational: 'Formalize the AI program with a dedicated leader — running it as a "+1 job" limits momentum',
+      building: 'Build a dedicated cross-functional team around the program leader to accelerate implementation',
+      advancing: 'Establish an active AI champion network alongside the core program team to scale adoption and share best practices'
+    },
+    { // Q4: Incentives
+      foundational: 'Create formal incentives for AI training and adoption — without them, learning and usage stay optional',
+      building: 'Implement broad incentives for AI adoption across the function to drive consistent usage and proficiency',
+      advancing: 'Evolve to role-based incentives that reward proficiency milestones specific to each team\'s AI use cases'
+    }
+  ],
+  // ── 1. Adoption (3 questions) ────────────────────────────────────────────
+  [
+    { // Q0: Usage frequency
+      foundational: 'Build a regular AI habit — move teams from occasional experimentation to weekly structured use',
+      building: 'Push usage from weekly to daily — make AI a default starting point for new work and planning',
+      advancing: 'Sustain daily AI usage and extend it to remaining holdouts through peer coaching and enablement'
+    },
+    { // Q1: Employee proficiency
+      foundational: 'Run hands-on, role-specific AI training tied to real job tasks — advance employees beyond basic use to AI as a genuine productivity co-worker',
+      building: 'Introduce a shared prompt library and launch a cohort-based agent builder program to turn individual productivity gains into team-wide capability',
+      advancing: 'Stand up a center of excellence to formalize the best personal AI workflows into shared, repeatable processes the entire function can use'
+    },
+    { // Q2: Leadership proficiency
+      foundational: 'Require leadership to complete a foundational AI fluency program — a key output should be each leader building their own personal chief of staff agent',
+      building: 'Host leadership-specific advanced AI workshops focused on strategic decision support, and assign each leader a 30-day AI use case challenge to accelerate hands-on proficiency',
+      advancing: 'Create a leadership AI showcase where leaders regularly demo their workflows to their teams, and challenge each to co-design at least one shared team workflow per quarter'
+    }
+  ],
+  // ── 2. Change (3 questions) ──────────────────────────────────────────────
+  [
+    { // Q0: Change management
+      foundational: 'Establish a formal, centralized change program with a dedicated lead — informal efforts fragment impact',
+      building: 'Centralize the change program under dedicated leadership that coordinates across the entire function',
+      advancing: 'Extend the change program by establishing formal champion roles embedded in each sub-function'
+    },
+    { // Q1: Feedback mechanisms
+      foundational: 'Stand up an official feedback forum and regular office hours — formalize what is currently word-of-mouth',
+      building: 'Connect tool usage data and change program insights into a comprehensive feedback loop for the AI program team',
+      advancing: 'Build a robust feedback system combining tool telemetrics, change engagement data, and qualitative surveys'
+    },
+    { // Q2: Culture / appetite for change
+      foundational: 'Address cultural resistance by building confidence through small, visible AI wins that demonstrate value',
+      building: 'Accelerate cultural momentum — celebrate transformation wins and reinforce the innovation mindset broadly',
+      advancing: 'Sustain the innovation culture by making transformation success stories a regular part of communications'
+    }
+  ],
+  // ── 3. Process (4 questions) ─────────────────────────────────────────────
+  [
+    { // Q0: % documented
+      foundational: 'Document your highest-volume marketing processes — close the most critical gaps in tribal knowledge',
+      building: 'Expand documentation coverage beyond 75% — prioritize processes most likely to benefit from AI augmentation',
+      advancing: 'Push toward near-complete documentation (90%+) to enable systematic AI integration across all workflows'
+    },
+    { // Q1: Documentation detail level
+      foundational: 'Add more detail to process docs — expand beyond general phases to include specific steps and dependencies',
+      building: 'Deepen process documentation to include data sources, data flows, and technology platforms alongside human workflow steps',
+      advancing: 'Deepen process documentation further to include agent tasks, agentic guardrails, and human escalation points for your most critical workflows'
+    },
+    { // Q2: Governance
+      foundational: 'Establish team-level process governance — move beyond individual workarounds to structured evaluation',
+      building: 'Create a central operations function that tracks KPIs and partners with team leads to optimize at a regular cadence',
+      advancing: 'Industrialize governance with formalized KPIs, regular reporting, and established ops leads in each sub-function'
+    },
+    { // Q3: Change communication & enforcement
+      foundational: 'Establish consistent communication for process changes — confirm understanding, not just awareness',
+      building: 'Implement centralized workflow platforms that help enforce process changes alongside communication',
+      advancing: 'Extend workflow platform enforcement to cover both human and agent workflows as AI integration deepens'
+    }
+  ],
+  // ── 4. Data (3 questions) ────────────────────────────────────────────────
+  [
+    { // Q0: Connectivity / interoperability
+      foundational: 'Connect your key marketing data sources — move beyond siloed data to reliable integrations',
+      building: 'Implement a central data layer or CDP to connect most marketing data sources reliably',
+      advancing: 'Achieve full real-time integration and interoperability across all marketing data sources'
+    },
+    { // Q1: Unified taxonomy
+      foundational: 'Establish a shared data taxonomy for core entities — inconsistent naming creates downstream confusion for AI',
+      building: 'Enforce the unified data taxonomy across all major marketing systems with designated stewards',
+      advancing: 'Align your marketing data taxonomy with an enterprise-wide standard adopted across all systems'
+    },
+    { // Q2: Data governance / cleaning
+      foundational: 'Establish proactive data cleaning — move from reactive fixes to scheduled maintenance with designated owners',
+      building: 'Implement automated data quality checks with regular data governance reviews and accountable source owners',
+      advancing: 'Build a mature data governance framework with automated cleaning, monitoring, and escalation across all sources'
+    }
+  ],
+  // ── 5. Marketing Technology (3 questions) ────────────────────────────────
+  [
+    { // Q0: Gen AI tools deployed
+      foundational: 'Map your highest-volume workflows to identify which are unserviced by any gen AI tool — prioritize deploying a general-purpose tool with full capabilities unlocked and a defined product owner before adding more',
+      building: 'Audit tool telemetrics to identify adoption gaps in your current stack before expanding — ensure existing tools are actively used against critical workflows, and only add new tools where genuine coverage gaps exist',
+      advancing: 'Use adoption telemetrics to validate that tools are actively embedded in critical workflows — underutilized tools signal a coverage or enablement gap that adding more tools won\'t solve'
+    },
+    { // Q1: Tool / feature access
+      foundational: 'Close critical tool and feature access gaps — marketers should not be blocked by missing tools or locked-down features',
+      building: 'Match tool and feature access to specific roles — eliminate mismatches where some have too little and others too much',
+      advancing: 'Fully optimize access by role and establish a regular review cadence to keep the stack aligned with evolving needs'
+    },
+    { // Q2: Tool switching
+      foundational: 'Reduce tool-switching friction in your most critical workflows — identify the biggest manual handoff bottlenecks',
+      building: 'Consolidate the most fragmented workflows into fewer connected tools with minimal manual handoffs',
+      advancing: 'Contain workflows within connected platforms so tool-switching becomes the exception, not the norm'
+    }
+  ],
+  // ── 6. Responsibility & Ethics (3 questions) ────────────────────────────
+  [
+    { // Q0: AI usage policy
+      foundational: 'Create a marketer-facing AI usage policy — plain English, easy to find, with practical guardrails and examples',
+      building: 'Actively communicate the AI usage policy and ensure most marketers know it exists and where to find it',
+      advancing: 'Add role-specific guidance and practical examples to the AI usage policy, and establish a regular refresh cadence as tools evolve'
+    },
+    { // Q1: Responsible use training
+      foundational: 'Deliver structured responsible AI use training — move beyond informal tips to a tracked learning program',
+      building: 'Track training completion and make responsible AI use part of onboarding for all marketing team members',
+      advancing: 'Make responsible AI use training mandatory with regular refreshes and competency tracked at a role level'
+    },
+    { // Q2: Accountability mechanism
+      foundational: 'Establish a consistent review process for AI outputs — informal self-review is not sufficient at scale',
+      building: 'Add AI-specific review criteria (hallucination, bias, brand safety, compliance) to the existing content review process',
+      advancing: 'Build a comprehensive AI output accountability framework with defined owners, escalation paths, and regular audits'
+    }
+  ]
+];
+
+function buildRecommendations(sortedCats, scores) {
+  // ── 1. Collect per-question recommendations grouped by category ──────
+  const catRecos = {}; // catId → [{ text, questionScore }]
+
+  CATEGORIES.forEach((cat, ci) => {
+    const items = [];
+    cat.questions.forEach((q, qi) => {
+      const answerIdx = state.answers[`${ci}_${qi}`];
+      if (answerIdx === undefined || answerIdx === null || answerIdx >= 4) return; // skip "Leading" (index 4) — already at top
+      const score = answerIdx + 1;
+      const recoSet = QUESTION_RECOS[ci]?.[qi];
+      if (!recoSet) return;
+
+      let text;
+      if (score <= 2) text = recoSet.foundational;
+      else if (score === 3) text = recoSet.building;
+      else text = recoSet.advancing;
+
+      if (text) items.push({ text, questionScore: score });
+    });
+    if (items.length) {
+      items.sort((a, b) => a.questionScore - b.questionScore);
+      catRecos[cat.id] = items;
+    }
+  });
+
+  // ── 2. Rank using the shared rankCategories function so priority cards
+  //       always agree with the exec summary ──────────────────────────────
+  const catNameMap  = Object.fromEntries(CATEGORIES.map(c => [c.id, c.name]));
+
+  const rankedCatIds = rankCategories(scores)
+    .map(c => c.id)
+    .filter(id => catRecos[id]);
+
+  // ── 3. P1 = first, P2 = second, P3 = everything else ─────────────────
+  const bucketCatIds = [
+    rankedCatIds.slice(0, 1),
+    rankedCatIds.slice(1, 2),
+    rankedCatIds.slice(2)
+  ];
+
+  // ── 5. Build item arrays and labels for each bucket ──────────────────
+  const buckets = bucketCatIds.map(catIds => {
+    const items = [];
+    catIds.forEach(catId => {
+      catRecos[catId].forEach(r => items.push(r.text));
+    });
+    return { items, catIds };
+  });
+
+  const makeLabel = (catIds) => {
+    const names = catIds.map(id => catNameMap[id]);
+    if (names.length === 0) return '';
+    return names.join(', ');
+  };
+
+  return {
+    short: buckets[0].items, medium: buckets[1].items, long: buckets[2].items,
+    shortLabel: makeLabel(buckets[0].catIds),
+    mediumLabel: makeLabel(buckets[1].catIds),
+    longLabel: buckets[2].catIds.length > 2 ? 'Other Recommendations' : makeLabel(buckets[2].catIds)
+  };
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  showScreen('welcome');
+});
+</script>
+</body>
+</html>
